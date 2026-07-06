@@ -717,6 +717,7 @@
 
       .balance-control input {
         width: 92px;
+        min-width: 0;
         border: 0;
         outline: 0;
         background: transparent;
@@ -1961,8 +1962,24 @@
           position: fixed;
           inset: 0 auto 0 0;
           width: min(320px, calc(100vw - 38px));
+          height: 100dvh;
+          min-height: 100vh;
+          grid-template-rows: auto auto auto;
+          align-content: start;
+          overflow-x: hidden;
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          -webkit-overflow-scrolling: touch;
+          padding-bottom: max(34px, env(safe-area-inset-bottom));
           transform: translateX(-104%);
           transition: transform 240ms ease;
+        }
+
+        .sidebar-bottom {
+          align-self: start;
+          margin-top: 28px;
+          margin-bottom: 0;
+          padding-bottom: 28px;
         }
 
         body.has-sidebar .sidebar {
@@ -2160,20 +2177,25 @@
         }
 
         .balance-control {
-          grid-column: 5 / 8;
+          grid-column: 5 / 9;
           justify-content: center;
-          gap: 6px;
-          padding: 0 7px;
+          gap: 8px;
+          min-width: 0;
+          padding: 0 10px;
         }
 
         .balance-control input {
-          width: 62px;
-          font-size: 14px;
+          flex: 1 1 auto;
+          width: auto;
+          min-width: 0;
+          font-size: clamp(11px, 3.2vw, 15px);
+          text-align: center;
         }
 
         .coin {
           width: 24px;
           height: 24px;
+          flex: 0 0 24px;
         }
 
         .rtp-control {
@@ -2193,14 +2215,16 @@
         }
 
         .currency-control {
-          grid-column: 8 / 13;
+          grid-column: 9 / 13;
           justify-content: center;
           padding: 0;
+          width: 100%;
         }
 
         .currency-toggle {
-          grid-template-columns: 24px 34px 14px;
+          grid-template-columns: 24px minmax(34px, 1fr) 14px;
           gap: 7px;
+          width: 100%;
           min-height: 44px;
           padding: 0 9px;
         }
@@ -3405,6 +3429,11 @@
         return Number.isFinite(number) ? number.toFixed(2) : "0.00";
       }
 
+      function fitBalanceText() {
+        const length = String(balanceInput.value || "").length;
+        balanceInput.style.fontSize = length > 10 ? "11px" : length > 8 ? "12px" : "";
+      }
+
       let currentGame = null;
 
       async function requestLaunchUrl(game) {
@@ -3773,10 +3802,12 @@
         balanceInput.value = decimals.length || balanceInput.value.includes(".")
           ? `${main.slice(0, 9)}.${decimals.slice(0, 2)}`
           : main.slice(0, 9);
+        fitBalanceText();
       });
 
       balanceInput.addEventListener("blur", () => {
         balanceInput.value = formatBalance(balanceInput.value);
+        fitBalanceText();
       });
 
       function setCurrency(option) {
@@ -3870,6 +3901,7 @@
       initPartnerLinks();
       loadAuthUser();
       applyLanguage();
+      fitBalanceText();
       loadHub88Catalog();
     </script>
   </body>
